@@ -250,7 +250,6 @@ public class Okno extends JFrame {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						
 					// gdy wybrano czesci mechaniczne
 					}else{
 						int row3 = table.getSelectedRow();
