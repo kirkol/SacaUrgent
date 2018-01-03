@@ -31,6 +31,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -63,6 +64,9 @@ public class Okno extends JFrame {
 	private JTextField textField_1;
 	private JRadioButton spawane;
 	private JRadioButton mechaniczne;
+	private SimpleDateFormat formatDaty = new SimpleDateFormat("yyyy-MM-dd");
+	private Calendar date = Calendar.getInstance();
+	private String dzisiaj = formatDaty.format(date.getTime());
 
 	/**
 	 * Launch the application.
@@ -192,6 +196,84 @@ public class Okno extends JFrame {
 		Image img1 = new ImageIcon(this.getClass().getResource("/light_mini.png")).getImage();
 		
 		JButton btnOznaczJakoPilne = new JButton("Pilne");
+		btnOznaczJakoPilne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(textField_1.getText().equals("")){
+					JOptionPane.showMessageDialog(null, "Nie zaznaczono ¿adnej pozycji");
+				}else{
+					//sprawdza czy wybrano zlozenia spawane czy mechaniczne
+					if(spawane.isSelected()){
+						
+						int row2 = table.getSelectedRow();
+						String projektGlowny = (table.getModel().getValueAt(row2, 0)).toString();
+						String zlozenieSpawane = (table.getModel().getValueAt(row2, 1)).toString();
+						ArrayList<String> CzesciDoZlozenia = new ArrayList<String>();
+						String CzesciDoZlozeniaString = CzesciDoZlozenia.toString();
+						
+						System.out.println(projektGlowny);
+						System.out.println(zlozenieSpawane);
+						
+						// szuka z tabeli spawane czesci, ktore naleza do wybranego zlozenia spawanego - zapisuje je w ArrayList, a pozniej konwertuje j¹ do Stringa
+						try {		
+							String query= "SELECT kodArt FROM spawane WHERE projekt = '"+projektGlowny+"' AND ArtykulNadrzedny = '"+zlozenieSpawane+"' AND nrZamowienia<>'Na magazynie'";
+							PreparedStatement pst=connection.prepareStatement(query);
+							ResultSet rs=pst.executeQuery();
+							while(rs.next()){
+								CzesciDoZlozenia.add("'"+rs.getString("kodArt")+"'");
+							}
+							CzesciDoZlozeniaString = CzesciDoZlozenia.toString();
+							CzesciDoZlozeniaString = CzesciDoZlozeniaString.replace('[', '(');
+							CzesciDoZlozeniaString = CzesciDoZlozeniaString.replace(']', ')');
+							System.out.println(CzesciDoZlozeniaString);
+							
+							pst.close();
+							rs.close();
+										
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+						// w tabeli saca znajduje czesci zapisane powyzej w CzesciDoZlozeniaString, a nastepnie nadaje im status pilne
+						try {
+							String query="";
+							if(CzesciDoZlozenia.isEmpty()){
+								// musi byc wywolane jakies query, nawet jesli czesci do zlozenia sa puste
+								query = "SELECT * FROM saca";
+							}else{
+								query= "UPDATE saca SET Wazne = 1 WHERE projekt = '"+projektGlowny+"' AND KodArtykulu IN "+CzesciDoZlozeniaString+" AND DataDodania = '"+dzisiaj+"'";
+							}
+							PreparedStatement pst=connection.prepareStatement(query);
+							ResultSet rs=pst.executeQuery();
+							pst.close();
+							rs.close();
+										
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					// gdy wybrano czesci mechaniczne
+					}else{
+						int row3 = table.getSelectedRow();
+						String projektGlowny = (table.getModel().getValueAt(row3, 0)).toString();
+						String artykul = (table.getModel().getValueAt(row3, 1)).toString();
+						System.out.println(projektGlowny);
+						System.out.println(artykul);
+						System.out.println(dzisiaj);
+						
+						try {		
+							String query= "UPDATE saca SET Wazne = 1 WHERE projekt = '"+projektGlowny+"' AND KodArtykulu = '"+artykul+"' AND DataDodania = '"+dzisiaj+"'";
+							PreparedStatement pst=connection.prepareStatement(query);
+							ResultSet rs=pst.executeQuery();
+							pst.close();
+							rs.close();
+										
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		});
 		btnOznaczJakoPilne.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnOznaczJakoPilne.setIcon(new ImageIcon(img1));
 		
@@ -264,7 +346,7 @@ public class Okno extends JFrame {
 		}else{
 			if(spawane.isSelected()){
 				try {		
-					String query= "SELECT DISTINCT spawane.projekt, spawane.ArtykulNadrzedny, partsoverview.ItemDesc AS NazwaArtykulu FROM spawane LEFT JOIN partsoverview ON spawane.ArtykulNadrzedny = partsoverview.itemno WHERE projekt LIKE '%/"+textField.getText()+"' AND nrZamowienia <> 'Na magazynie'";
+					String query= "SELECT DISTINCT spawane.projekt, spawane.ArtykulNadrzedny AS ZlozenieSpawane, partsoverview.ItemDesc AS NazwaZlozenia FROM spawane LEFT JOIN partsoverview ON spawane.ArtykulNadrzedny = partsoverview.itemno WHERE projekt LIKE '%/"+textField.getText()+"' AND nrZamowienia <> 'Na magazynie'";
 					PreparedStatement pst=connection.prepareStatement(query);
 					ResultSet rs=pst.executeQuery();
 					table.setModel(DbUtils.resultSetToTableModel(rs));
@@ -277,7 +359,7 @@ public class Okno extends JFrame {
 			}
 			if(mechaniczne.isSelected()){
 				try {		
-					String query= "SELECT projekt, KodArtykulu AS Artykul, NazwaArtykulu FROM saca WHERE projekt LIKE '%/"+textField.getText()+"' AND typ='M'";
+					String query= "SELECT projekt, KodArtykulu AS Artykul, NazwaArtykulu FROM saca WHERE projekt LIKE '%/"+textField.getText()+"' AND typ='M' AND DataDodania = '"+dzisiaj+"'";
 					PreparedStatement pst=connection.prepareStatement(query);
 					ResultSet rs=pst.executeQuery();
 					table.setModel(DbUtils.resultSetToTableModel(rs));
