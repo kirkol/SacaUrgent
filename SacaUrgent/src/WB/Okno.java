@@ -290,7 +290,5 @@ public class Okno extends JFrame {
 				}
 			}
 		}
-			
-		
 	}
 }
