@@ -1,17 +1,13 @@
 package WB;
 import java.awt.Image;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import net.proteanit.sql.DbUtils;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -66,6 +62,7 @@ public class Okno extends JFrame {
 	private SimpleDateFormat formatDaty = new SimpleDateFormat("yyyy-MM-dd");
 	private Calendar date = Calendar.getInstance();
 	private String dzisiaj = formatDaty.format(date.getTime());
+	private String DodaneDoPilnych = "";
 
 	/**
 	 * Launch the application.
@@ -95,7 +92,7 @@ public class Okno extends JFrame {
 		setBackground(Color.WHITE);
 		setTitle("Pilne SACA");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 579, 563);
+		setBounds(100, 100, 579, 709);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -147,6 +144,11 @@ public class Okno extends JFrame {
 		textField.setColumns(10);
 		
 		spawane = new JRadioButton("spawane");
+		spawane.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ShowTable(connection, table);
+			}
+		});
 		spawane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -158,6 +160,11 @@ public class Okno extends JFrame {
 		spawane.setSelected(true);
 		
 		mechaniczne = new JRadioButton("mechaniczne");
+		mechaniczne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ShowTable(connection, table);
+			}
+		});
 		mechaniczne.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -170,6 +177,11 @@ public class Okno extends JFrame {
 		ButtonGroup grupa = new ButtonGroup();
 		grupa.add(spawane);
 		grupa.add(mechaniczne);
+		
+		JTextArea txtrDodanoDoPilnych = new JTextArea();
+		txtrDodanoDoPilnych.setFont(new Font("Century", Font.PLAIN, 12));
+		txtrDodanoDoPilnych.setLineWrap(true);
+		txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
 		
 		JButton btnSzukaj = new JButton("Szukaj");
 		btnSzukaj.addActionListener(new ActionListener() {
@@ -193,6 +205,7 @@ public class Okno extends JFrame {
 		textField_1.setColumns(10);
 		
 		Image img1 = new ImageIcon(this.getClass().getResource("/light_mini.png")).getImage();
+		Image img2 = new ImageIcon(this.getClass().getResource("/refresh_mini.png")).getImage();
 		
 		JButton btnOznaczJakoPilne = new JButton("Pilne");
 		btnOznaczJakoPilne.addActionListener(new ActionListener() {
@@ -249,6 +262,12 @@ public class Okno extends JFrame {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+						
+						//dodanie wybranej pozycji do listy Dodano do pilnych
+						
+						DodaneDoPilnych = DodaneDoPilnych + zlozenieSpawane + " czêœci: " + CzesciDoZlozeniaString + ", ";
+						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
+						
 					// gdy wybrano czesci mechaniczne
 					}else{
 						int row3 = table.getSelectedRow();
@@ -268,12 +287,112 @@ public class Okno extends JFrame {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+						
+						//dodanie wybranej pozycji do listy Dodano do pilnych
+						
+						DodaneDoPilnych = DodaneDoPilnych + artykul + ", ";
+						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
 					}
 				}
 			}
 		});
 		btnOznaczJakoPilne.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnOznaczJakoPilne.setIcon(new ImageIcon(img1));
+		
+		
+		// ODZNACZENIE POZYCJI JAKO PILNEJ
+		
+		JButton btnNiePilne = new JButton("Nie pilne");
+		btnNiePilne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg) {
+				if(textField_1.getText().equals("")){
+					JOptionPane.showMessageDialog(null, "Nie zaznaczono ¿adnej pozycji");
+				}else{
+					//sprawdza czy wybrano zlozenia spawane czy mechaniczne
+					if(spawane.isSelected()){
+						
+						int row2 = table.getSelectedRow();
+						String projektGlowny = (table.getModel().getValueAt(row2, 0)).toString();
+						String zlozenieSpawane = (table.getModel().getValueAt(row2, 1)).toString();
+						ArrayList<String> CzesciDoZlozenia = new ArrayList<String>();
+						String CzesciDoZlozeniaString = CzesciDoZlozenia.toString();
+						
+						System.out.println(projektGlowny);
+						System.out.println(zlozenieSpawane);
+						
+						// szuka z tabeli spawane czesci, ktore naleza do wybranego zlozenia spawanego - zapisuje je w ArrayList, a pozniej konwertuje j¹ do Stringa
+						try {		
+							String query= "SELECT kodArt FROM spawane WHERE projekt = '"+projektGlowny+"' AND ArtykulNadrzedny = '"+zlozenieSpawane+"' AND nrZamowienia<>'Na magazynie'";
+							PreparedStatement pst=connection.prepareStatement(query);
+							ResultSet rs=pst.executeQuery();
+							while(rs.next()){
+								CzesciDoZlozenia.add("'"+rs.getString("kodArt")+"'");
+							}
+							CzesciDoZlozeniaString = CzesciDoZlozenia.toString();
+							CzesciDoZlozeniaString = CzesciDoZlozeniaString.replace('[', '(');
+							CzesciDoZlozeniaString = CzesciDoZlozeniaString.replace(']', ')');
+							System.out.println(CzesciDoZlozeniaString);
+							
+							pst.close();
+							rs.close();
+										
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+						// w tabeli saca znajduje czesci zapisane powyzej w CzesciDoZlozeniaString, a nastepnie nadaje im status pilne
+						try {
+							String query="";
+							if(CzesciDoZlozenia.isEmpty()){
+								// musi byc wywolane jakies query, nawet jesli czesci do zlozenia sa puste
+								query = "SELECT * FROM saca";
+							}else{
+								query= "UPDATE saca SET Wazne = 0 WHERE projekt = '"+projektGlowny+"' AND KodArtykulu IN "+CzesciDoZlozeniaString+" AND DataDodania = '"+dzisiaj+"'";
+							}
+							PreparedStatement pst=connection.prepareStatement(query);
+							ResultSet rs=pst.executeQuery();
+							pst.close();
+							rs.close();
+										
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+						//dodanie wybranej pozycji do listy Dodano do pilnych
+						
+						DodaneDoPilnych = DodaneDoPilnych.replace(zlozenieSpawane + " czêœci: " + CzesciDoZlozeniaString + ", ", "");
+						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
+						
+					// gdy wybrano czesci mechaniczne
+					}else{
+						int row3 = table.getSelectedRow();
+						String projektGlowny = (table.getModel().getValueAt(row3, 0)).toString();
+						String artykul = (table.getModel().getValueAt(row3, 1)).toString();
+						System.out.println(projektGlowny);
+						System.out.println(artykul);
+						System.out.println(dzisiaj);
+						
+						try {		
+							String query= "UPDATE saca SET Wazne = 0 WHERE projekt = '"+projektGlowny+"' AND KodArtykulu = '"+artykul+"' AND DataDodania = '"+dzisiaj+"'";
+							PreparedStatement pst=connection.prepareStatement(query);
+							ResultSet rs=pst.executeQuery();
+							pst.close();
+							rs.close();
+										
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+						//dodanie wybranej pozycji do listy Dodano do pilnych
+						
+						DodaneDoPilnych = DodaneDoPilnych.replace(artykul + ", ", "");
+						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
+					}
+				}
+			}
+		});
+		btnNiePilne.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnNiePilne.setIcon(new ImageIcon(img2));
 		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
@@ -298,11 +417,17 @@ public class Okno extends JFrame {
 								.addComponent(textField))))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnOznaczJakoPilne)
-					.addContainerGap(230, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnNiePilne, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(128, Short.MAX_VALUE))
 				.addComponent(lblMojeMenu, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
+					.addContainerGap())
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(txtrDodanoDoPilnych, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
@@ -322,10 +447,12 @@ public class Okno extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSzukaj)
 						.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnOznaczJakoPilne, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnOznaczJakoPilne, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnNiePilne, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(txtrDodanoDoPilnych, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
 		
