@@ -3,6 +3,8 @@ import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import net.proteanit.sql.DbUtils;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
@@ -107,6 +110,7 @@ public class Okno extends JFrame {
 		table = new JTable();
 		table.setBackground(Color.WHITE);
 		table.setAutoCreateRowSorter(true);
+		table.setDefaultRenderer(Object.class, new TableCellRendererColor());
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -194,7 +198,6 @@ public class Okno extends JFrame {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode()==KeyEvent.VK_ENTER){
 					ShowTable(connection, table);
-					System.out.println("aaa");
 				}
 			}
 		});
@@ -268,6 +271,11 @@ public class Okno extends JFrame {
 						DodaneDoPilnych = DodaneDoPilnych + zlozenieSpawane + " czêœci: " + CzesciDoZlozeniaString + ", ";
 						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
 						
+						//zakolorowanie wybranej pozycji
+						
+						table.repaint();
+						ShowTable(connection, table);
+						
 					// gdy wybrano czesci mechaniczne
 					}else{
 						int row3 = table.getSelectedRow();
@@ -292,6 +300,12 @@ public class Okno extends JFrame {
 						
 						DodaneDoPilnych = DodaneDoPilnych + artykul + ", ";
 						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
+						
+						//zakolorowanie wybranej pozycji
+						
+						table.repaint();
+						ShowTable(connection, table);
+					
 					}
 				}
 			}
@@ -358,10 +372,15 @@ public class Okno extends JFrame {
 							e.printStackTrace();
 						}
 						
-						//dodanie wybranej pozycji do listy Dodano do pilnych
+						//usuniecie wybranej pozycji do listy Dodano do pilnych
 						
 						DodaneDoPilnych = DodaneDoPilnych.replace(zlozenieSpawane + " czêœci: " + CzesciDoZlozeniaString + ", ", "");
 						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
+						
+						//ODkolorowanie wybranej pozycji
+						
+						table.repaint();
+						ShowTable(connection, table);
 						
 					// gdy wybrano czesci mechaniczne
 					}else{
@@ -383,10 +402,15 @@ public class Okno extends JFrame {
 							e.printStackTrace();
 						}
 						
-						//dodanie wybranej pozycji do listy Dodano do pilnych
+						//usuniecie wybranej pozycji do listy Dodano do pilnych
 						
 						DodaneDoPilnych = DodaneDoPilnych.replace(artykul + ", ", "");
 						txtrDodanoDoPilnych.setText("Dodano do pilnych:\r\n- "+DodaneDoPilnych);
+					
+						//ODkolorowanie wybranej pozycji
+						
+						table.repaint();
+						ShowTable(connection, table);
 					}
 				}
 			}
@@ -471,7 +495,7 @@ public class Okno extends JFrame {
 		}else{
 			if(spawane.isSelected()){
 				try {		
-					String query= "SELECT DISTINCT spawane.projekt, spawane.ArtykulNadrzedny AS ZlozenieSpawane, partsoverview.ItemDesc AS NazwaZlozenia FROM spawane LEFT JOIN partsoverview ON spawane.ArtykulNadrzedny = partsoverview.itemno WHERE projekt LIKE '%/"+textField.getText()+"' AND nrZamowienia <> 'Na magazynie'";
+					String query= "SELECT DISTINCT spawane.projekt, spawane.ArtykulNadrzedny AS ZlozenieSpawane, partsoverview.ItemDesc AS NazwaZlozenia, saca.Wazne AS Pilne FROM spawane LEFT JOIN partsoverview ON spawane.ArtykulNadrzedny = partsoverview.itemno LEFT JOIN saca ON spawane.KodArt=saca.KodArtykulu WHERE spawane.projekt LIKE '%/"+textField.getText()+"' AND spawane.nrZamowienia <> 'Na magazynie' AND DataDodania = '"+dzisiaj+"'";
 					PreparedStatement pst=connection.prepareStatement(query);
 					ResultSet rs=pst.executeQuery();
 					table.setModel(DbUtils.resultSetToTableModel(rs));
@@ -484,7 +508,7 @@ public class Okno extends JFrame {
 			}
 			if(mechaniczne.isSelected()){
 				try {		
-					String query= "SELECT projekt, KodArtykulu AS Artykul, NazwaArtykulu FROM saca WHERE projekt LIKE '%/"+textField.getText()+"' AND typ='M' AND DataDodania = '"+dzisiaj+"'";
+					String query= "SELECT projekt, KodArtykulu AS Artykul, NazwaArtykulu, Wazne AS Pilne FROM saca WHERE projekt LIKE '%/"+textField.getText()+"' AND typ='M' AND DataDodania = '"+dzisiaj+"'";
 					PreparedStatement pst=connection.prepareStatement(query);
 					ResultSet rs=pst.executeQuery();
 					table.setModel(DbUtils.resultSetToTableModel(rs));
@@ -497,4 +521,33 @@ public class Okno extends JFrame {
 			}
 		}
 	}
+	public class TableCellRendererColor extends DefaultTableCellRenderer{
+		
+		private Component komponent;
+		
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
+			
+			komponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			
+			int ileWierszy = table.getModel().getRowCount();
+			int nrKolumny=1;
+
+			
+			for (int i = 0; i < ileWierszy; i++){
+				
+				Object Komorka = table.getModel().getValueAt(row, column);
+
+				if (DodaneDoPilnych.contains(Komorka.toString()) && column!=3){
+					komponent.setBackground(new java.awt.Color(255, 221, 153));
+				}else{
+					komponent.setBackground(new java.awt.Color(255,255,255));
+				}
+			}
+			
+			return komponent;
+		}
+		
+	}
 }
+
+
