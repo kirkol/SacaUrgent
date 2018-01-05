@@ -47,6 +47,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.toedter.calendar.JDateChooser;
+
+import PDF.PDF_SACA2;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.ItemListener;
@@ -423,7 +426,7 @@ public class Okno extends JFrame {
 		btnAktualizuj.setIcon(new ImageIcon(img3));
 		btnAktualizuj.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// ASIA ASIA ASIA!!! TUTAJ WRZUC SWOJA MAGICZNA LISTE!!! :D
+				PDF_SACA2.createDoc();
 			}
 		});
 		btnAktualizuj.setFont(new Font("Tahoma", Font.BOLD, 11));

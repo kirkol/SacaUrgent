@@ -3,6 +3,7 @@ package PDF;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,14 +45,13 @@ public class PDF_SACA2 {
 		Calendar date = Calendar.getInstance();
 		String dzis = doNazwy2.format(date.getTime());
 		PdfWriter writerM;
-		PdfWriter writerK;
-		PdfWriter writer;
 		try{
 			String path = PDF.Parameters.getPathToSave()+"/"+doNazwy.format(date.getTime())+"/";
 			String nameMech = "SACA mechaniczne.pdf";
 			File fMech = new File(path+nameMech);
-			if(fMech.exists() && !fMech.isDirectory())
-				nameMech = godz.format(date.getTime())+" "+nameMech;
+			if(fMech.exists() && !fMech.isDirectory()) {
+				if(!fMech.delete()) {nameMech = godz.format(date.getTime())+" "+nameMech;}
+			}
 			writerM = PdfWriter.getInstance(ListMech, new FileOutputStream(path+nameMech));
 			ListMech.open();
 			ListK.open();
