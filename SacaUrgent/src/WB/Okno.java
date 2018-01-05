@@ -459,7 +459,7 @@ public class Okno extends JFrame {
 					.addContainerGap()
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
 					.addContainerGap())
-				.addGroup(gl_contentPane.createSequentialGroup()
+				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(txtrDodanoDoPilnych, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
 					.addContainerGap())
@@ -476,7 +476,7 @@ public class Okno extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblProjekt))
-					.addGap(2)
+					.addPreferredGap(ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(spawane)
 						.addComponent(lblTyp, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)
@@ -490,9 +490,10 @@ public class Okno extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(txtrDodanoDoPilnych, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
+					.addComponent(txtrDodanoDoPilnych, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnAktualizuj, GroupLayout.PREFERRED_SIZE, 28, Short.MAX_VALUE))
+					.addComponent(btnAktualizuj, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
+					.addGap(12))
 		);
 		contentPane.setLayout(gl_contentPane);
 		
