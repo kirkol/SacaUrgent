@@ -209,6 +209,7 @@ public class Okno extends JFrame {
 		
 		Image img1 = new ImageIcon(this.getClass().getResource("/light_mini.png")).getImage();
 		Image img2 = new ImageIcon(this.getClass().getResource("/refresh_mini.png")).getImage();
+		Image img3 = new ImageIcon(this.getClass().getResource("/Check-icon2.png")).getImage();
 		
 		JButton btnOznaczJakoPilne = new JButton("Pilne");
 		btnOznaczJakoPilne.addActionListener(new ActionListener() {
@@ -418,9 +419,18 @@ public class Okno extends JFrame {
 		btnNiePilne.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnNiePilne.setIcon(new ImageIcon(img2));
 		
+		JButton btnAktualizuj = new JButton("Aktualizuj");
+		btnAktualizuj.setIcon(new ImageIcon(img3));
+		btnAktualizuj.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// ASIA ASIA ASIA!!! TUTAJ WRZUC SWOJA MAGICZNA LISTE!!! :D
+			}
+		});
+		btnAktualizuj.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
+			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
@@ -453,6 +463,10 @@ public class Okno extends JFrame {
 					.addContainerGap()
 					.addComponent(txtrDodanoDoPilnych, GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
 					.addContainerGap())
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap(405, Short.MAX_VALUE)
+					.addComponent(btnAktualizuj, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -476,7 +490,9 @@ public class Okno extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(txtrDodanoDoPilnych, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+					.addComponent(txtrDodanoDoPilnych, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnAktualizuj, GroupLayout.PREFERRED_SIZE, 28, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
 		
