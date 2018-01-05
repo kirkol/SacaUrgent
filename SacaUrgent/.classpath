@@ -9,5 +9,16 @@
 	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/sqltool.jar"/>
 	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/rs2xml.jar"/>
 	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-barcodes-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-font-asian-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-forms-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-hyph-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-io-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-kernel-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-layout-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-pdfa-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-pdftest-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itext7-sign-7.0.0.jar"/>
+	<classpathentry kind="lib" path="//dataserver/Logistyka/Tosia/Projekty JAVA/biblioteki/itextpdf-5.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
