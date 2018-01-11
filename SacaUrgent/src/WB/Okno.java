@@ -515,6 +515,7 @@ public class Okno extends JFrame {
 		}else{
 			if(spawane.isSelected()){
 				try {		
+					//LEFT JOIN saca ON spawane.KodArt=saca.KodArtykulu AND SPAWANE.Projekt = SACA.projekt 
 					String query= "SELECT DISTINCT spawane.projekt, spawane.ArtykulNadrzedny AS ZlozenieSpawane, partsoverview.ItemDesc AS NazwaZlozenia, saca.Wazne AS Pilne FROM spawane LEFT JOIN partsoverview ON spawane.ArtykulNadrzedny = partsoverview.itemno LEFT JOIN saca ON spawane.KodArt=saca.KodArtykulu WHERE spawane.projekt LIKE '%/"+textField.getText()+"' AND spawane.nrZamowienia <> 'Na magazynie' AND DataDodania = '"+dzisiaj+"'";
 					PreparedStatement pst=connection.prepareStatement(query);
 					ResultSet rs=pst.executeQuery();

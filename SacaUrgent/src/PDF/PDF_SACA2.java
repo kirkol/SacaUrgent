@@ -80,9 +80,10 @@ public class PDF_SACA2 {
 				PdfPTable wazneSaca = new PdfPTable(9);
 				addHeaderW(wazneSaca);
 				float widthsWazne[] = new float[] {10, 10, 12, 14, 8, 8, 8, 10, 5};
-				String sqlwazne2 = "Select projekt, NrZamowienia2, kodartykulu, nazwaartykulu, pozostalodoprojektu, pozostalonazamowieniu, jednostka, cel, saca.typ from saca "
+				String sqlwazne2 = "Select projekt, NrZamowienia2, kodartykulu, nazwaartykulu, sum(pozostalodoprojektu), pozostalonazamowieniu, jednostka, cel, saca.typ from saca "
 						+ "join calendar on saca.projekt = calendar.nrMaszyny "
 						+ "where datadodania = '"+dzis+"' and wazne = 1 "
+								+ "group by NrZamowienia2, kodartykulu"
 								+ "order by calendar.dataProdukcji, saca.typ desc, saca.kodartykulu";
 				Statement Parts = myConn.createStatement();
 				ResultSet rsParts = Parts.executeQuery(sqlwazne2);
@@ -164,8 +165,8 @@ public class PDF_SACA2 {
 							addCell(tableM, nrZam, b);
 							addCell(tableM, ArticleNo, b);
 							addCell(tableM, ArticleName, b);
-							addCell(tableM, ileWZamowieniu, b);
 							addCell(tableM, ileDoProj, b);
+							addCell(tableM, ileWZamowieniu, b);
 							addCell(tableM, jednostka, b);
 							addCell(tableM, bon, b);
 							addCell(tableM,typArtykuluSACA, b);
