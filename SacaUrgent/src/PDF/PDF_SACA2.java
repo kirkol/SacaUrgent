@@ -80,10 +80,10 @@ public class PDF_SACA2 {
 				PdfPTable wazneSaca = new PdfPTable(9);
 				addHeaderW(wazneSaca);
 				float widthsWazne[] = new float[] {10, 10, 12, 14, 8, 8, 8, 10, 5};
-				String sqlwazne2 = "Select projekt, NrZamowienia2, kodartykulu, nazwaartykulu, sum(pozostalodoprojektu), pozostalonazamowieniu, jednostka, cel, saca.typ from saca "
+				String sqlwazne2 = "Select projekt, NrZamowienia2, kodartykulu, nazwaartykulu, sum(pozostalodoprojektu) as pozostalodoprojektu, pozostalonazamowieniu, jednostka, cel, saca.typ from saca "
 						+ "join calendar on saca.projekt = calendar.nrMaszyny "
 						+ "where datadodania = '"+dzis+"' and wazne = 1 "
-								+ "group by NrZamowienia2, kodartykulu"
+								+ "group by NrZamowienia2, kodartykulu "
 								+ "order by calendar.dataProdukcji, saca.typ desc, saca.kodartykulu";
 				Statement Parts = myConn.createStatement();
 				ResultSet rsParts = Parts.executeQuery(sqlwazne2);
@@ -204,7 +204,7 @@ public class PDF_SACA2 {
 	
 	
 	private static void addHeaderW(PdfPTable t){
-		String [] nagl = new String[] {"Projekt", "Nr zamowienia", "Kod artykulu", "Nazwa artykulu", "Do projektu", "W zamowieniu", "Jednostka", "Dok¹d", "Typ"};
+		String [] nagl = new String[] {"Projekt", "Nr zamowienia", "Kod artykulu", "Nazwa artykulu", "Ile pilnych", "W zamowieniu", "Jednostka", "Dok¹d", "Typ"};
 		for(int i = 0; i<nagl.length; i++) {
 			PdfPCell cell1 = new PdfPCell(new Phrase(nagl[i], ffont));
 			cell1.setMinimumHeight(30);
