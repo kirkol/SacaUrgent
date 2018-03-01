@@ -84,7 +84,7 @@ public class PDF_SACA2 {
 						+ "join calendar on saca.projekt = calendar.nrMaszyny "
 						+ "where datadodania = '"+dzis+"' and wazne = 1 "
 								+ "group by NrZamowienia2, kodartykulu "
-								+ "order by calendar.dataProdukcji, saca.typ desc, saca.kodartykulu";
+								+ "order by calendar.dataProdukcji asc, projekt asc, saca.typ desc, saca.kodartykulu";
 				Statement Parts = myConn.createStatement();
 				ResultSet rsParts = Parts.executeQuery(sqlwazne2);
 				while(rsParts.next()) {
